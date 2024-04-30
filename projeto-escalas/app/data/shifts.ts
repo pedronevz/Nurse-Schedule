@@ -14,3 +14,5 @@ const shifts = [
     { id: "F", description: "Folga Semanal", start: "", end: "", totalHours: "00:00", break: "", workHours: "00:00" },
     { id: "FE", description: "Férias", start: "", end: "", totalHours: "00:00", break: "", workHours: "00:00" }
 ];
+
+export default shifts;
