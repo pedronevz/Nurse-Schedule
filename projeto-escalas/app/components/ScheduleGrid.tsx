@@ -2,12 +2,18 @@ import React, { useState } from 'react'
 import { Nurse, ScheduleGridProps } from '../types';
 import shifts from '../data/shifts';
 
-const ScheduleGrid: React.FC<ScheduleGridProps> = ({ nurses, daysInMonth }) => {
+const ScheduleGrid: React.FC<ScheduleGridProps> = ({ nurses, daysInMonth, year, month }) => {
   const [selectedShifts, setSelectedShifts] = useState<{ [key: string]: string }>({});
 
   const handleShiftChange = (nurseId: number, day: number, shiftId: string) => {
     const key = `${nurseId}-${day}`;
     setSelectedShifts(prev => ({ ...prev, [key]: shiftId }));
+  };
+
+  function getDayOfWeek(day: number) {
+    const date = new Date(year, month, day);
+    const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    return daysOfWeek[date.getDay()];
   };
 
   return (
@@ -17,7 +23,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ nurses, daysInMonth }) => {
           <tr className="w-full h-16 border-gray-300 border-b py-8">
             <th className="text-left pl-4">Colaborador</th>
             {Array.from({ length: daysInMonth }, (_, i) => (
-              <th key={i} className="px-8 py-2">Dia {i + 1}</th>
+              <th key={i} className="px-8 py-2">{getDayOfWeek(i + 1)} {i + 1}</th>
             ))}
           </tr>
         </thead>

@@ -6,4 +6,7 @@ export interface Nurse {
 export interface ScheduleGridProps {
     nurses: Nurse[];
     daysInMonth: number;
+    year: number;
+    month: number;
 }
+
