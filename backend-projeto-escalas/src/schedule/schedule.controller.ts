@@ -1,12 +1,25 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query, Body, Post } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
+import { DatabaseService } from 'src/database/database.service';
 
-@Controller('schedules')
+@Controller('schedule')
 export class ScheduleController {
-  constructor(private scheduleService: ScheduleService) {}
+    constructor(private databaseService: DatabaseService) {}
 
-  @Get('/:year/:month')
-  getSchedule(@Param('year') year: number, @Param('month') month: number) {
-    return this.scheduleService.getScheduleForMonth(year, month);
-  }
+    @Get()
+    async getSchedule(@Query('month') month: number, @Query('year') year: number) {
+        const escalas = await this.databaseService.query(
+            'SELECT * FROM escalas WHERE month = $1 AND year = $2', [month, year]
+        );
+        return escalas;
+    }
+
+    @Post()
+    async addSchedule(@Body() scheduleData: { nurse_id: number; day: number; shift_id: string; month: number; year: number }) {
+        const newSchedule = await this.databaseService.query(
+            'INSERT INTO escalas (nurse_id, day, shift_id, month, year) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [scheduleData.nurse_id, scheduleData.day, scheduleData.shift_id, scheduleData.month, scheduleData.year]
+        );
+        return newSchedule;
+    }
 }

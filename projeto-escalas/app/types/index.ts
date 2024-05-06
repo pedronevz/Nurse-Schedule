@@ -1,6 +1,7 @@
 export interface Nurse {
     id: number;
     name: string;
+    coren: string;
 }
   
 export interface ScheduleGridProps {

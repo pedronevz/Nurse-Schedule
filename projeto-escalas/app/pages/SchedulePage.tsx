@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 
 const SchedulePage: React.FC = () => {
   const [nurses, setNurses] = useState<Nurse[]>([
-    { id: 1, name: 'Maria' },
-    { id: 2, name: 'João' }
+    { id: 1, name: 'Maria', coren:'123456' },
+    { id: 2, name: 'João', coren:'234567' }
   ]);
 
   const [year, setYear] = useState<number>(new Date().getFullYear());

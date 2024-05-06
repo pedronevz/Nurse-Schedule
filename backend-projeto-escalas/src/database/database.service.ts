@@ -16,7 +16,11 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    await this.pool.connect();
+    await this.pool.query(`CREATE TABLE IF NOT EXISTS nurses (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      coren VARCHAR(6) NOT NULL
+    );`);
   }
 
   async onModuleDestroy() {
@@ -26,5 +30,5 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   async query(query: string, params?: any[]): Promise<any> {
     const { rows } = await this.pool.query(query, params);
     return rows;
-  }
+}
 }
