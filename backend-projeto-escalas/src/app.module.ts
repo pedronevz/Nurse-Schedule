@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { DatabaseService } from './database/database.service';
+import { ScheduleModule } from './schedule/schedule.module';
+import { NurseModule } from './nurses/nurse.module';
 
 @Module({
-  imports: [],
-  providers: [DatabaseService],
+  imports: [ScheduleModule, NurseModule] 
 })
 export class AppModule {}

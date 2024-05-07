@@ -20,7 +20,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       coren VARCHAR(6) NOT NULL
-    );`);
+    );
+    
+    CREATE TABLE IF NOT EXISTS schedules (
+      id SERIAL PRIMARY KEY,
+      nurse_id INTEGER NOT NULL,
+      day DATE NOT NULL,
+      shift_type VARCHAR(255) NOT NULL,
+      FOREIGN KEY (nurse_id) REFERENCES nurses(id)
+  );
+    `);
   }
 
   async onModuleDestroy() {
