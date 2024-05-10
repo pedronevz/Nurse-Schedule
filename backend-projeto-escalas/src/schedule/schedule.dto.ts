@@ -1,15 +1,19 @@
-import { IsNotEmpty, IsInt, IsDateString, IsString } from 'class-validator';
+import { IsNotEmpty, IsInt, IsObject } from 'class-validator';
 
 export class ScheduleDto {
     @IsInt()
     @IsNotEmpty()
     nurseId: number;
 
-    @IsDateString()
+    @IsInt()
     @IsNotEmpty()
-    day: string;
+    month: number;
 
-    @IsString()
+    @IsInt()
     @IsNotEmpty()
-    shift_type: string;
+    year: number;
+
+    @IsObject()
+    @IsNotEmpty()
+    schedule: Record<string, string>;
 }

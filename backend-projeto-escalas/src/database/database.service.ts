@@ -19,15 +19,17 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.pool.query(`CREATE TABLE IF NOT EXISTS nurses (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      coren VARCHAR(6) NOT NULL
+      coren VARCHAR(6) NOT NULL UNIQUE
     );
     
     CREATE TABLE IF NOT EXISTS schedules (
       id SERIAL PRIMARY KEY,
       nurse_id INTEGER NOT NULL,
-      day DATE NOT NULL,
-      shift_type VARCHAR(255) NOT NULL,
-      FOREIGN KEY (nurse_id) REFERENCES nurses(id)
+      month INTEGER NOT NULL,
+      year INTEGER NOT NULL,
+      schedule JSON NOT NULL,
+      FOREIGN KEY (nurse_id) REFERENCES nurses(id),
+      CONSTRAINT unique_nurse_schedule UNIQUE (nurse_id, month, year)
   );
     `);
   }
