@@ -4,10 +4,6 @@ export interface Nurse {
     coren: string;
 }
   
-export interface ScheduleGridProps {
-    nurses: Nurse[];
-    daysInMonth: number;
-    year: number;
-    month: number;
-}
-
+export interface MonthYearSelectorProps {
+    onChange: (year: number, month: number) => void;
+  }

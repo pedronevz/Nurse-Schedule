@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -13,6 +13,16 @@ export class NurseService {
     
     async create(nurseDto): Promise<any> {
       const { name, coren } = nurseDto;
+
+      const checkCorenQuery = `
+        SELECT id FROM nurses WHERE coren = $1;
+      `;
+
+      const nurseExists = await this.databaseService.query(checkCorenQuery, [coren]);
+      if (nurseExists.length > 0) {
+        throw new ConflictException('O COREN fornecido já está em uso por outro enfermeiro.');
+      }
+
       const insertQuery = `
           INSERT INTO nurses (name, coren)
           VALUES ($1, $2)

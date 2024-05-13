@@ -1,13 +1,17 @@
-import { Controller, Get, Param, Query, Body, Post } from '@nestjs/common';
+import { Controller, Get, Param, Query, Body, Post, NotFoundException } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 
 
 @Controller('schedule')
 export class ScheduleController {
     constructor(private scheduleService: ScheduleService) {}
-        @Get('/:nurseId')
-        findByNurseId(@Param('nurseId') nurseId: number) {
-            return this.scheduleService.findByNurseId(nurseId);
+        @Get('/:nurseId/:year/:month')
+        findByNurseId(@Param('nurseId') nurseId: number, @Param('year') year: number, @Param ('month') month: number) {
+            const result = this.scheduleService.findByNurseId(nurseId, year, month);
+            if (!result) {
+                throw new NotFoundException('Sem escala');
+            }
+            return result;
         }
     
         @Post('/')
