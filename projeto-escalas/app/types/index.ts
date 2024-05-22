@@ -21,6 +21,10 @@ export interface ScheduleViewerProps {
     onShiftChange: (day: string, newShift: string) => void;
 }
 
+export interface NurseSelectionProps {
+    onChange: (nurseId: number | null) => void;
+  }
+
 export interface MonthYearSelectorProps {
     onChange: (year: number, month: number) => void;
   }

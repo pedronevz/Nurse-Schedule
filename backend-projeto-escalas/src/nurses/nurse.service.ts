@@ -4,6 +4,13 @@ import { DatabaseService } from '../database/database.service';
 @Injectable()
 export class NurseService {
   constructor(private databaseService: DatabaseService) {}
+    async findAllNurses(): Promise<any[]> {
+      const query = `
+          SELECT * FROM nurses;
+      `;
+      return await this.databaseService.query(query);
+    }
+  
     async findNurse(id: number): Promise<any[]> {
         const query = `
             SELECT * FROM nurses WHERE id = $1;

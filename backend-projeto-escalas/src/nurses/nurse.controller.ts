@@ -5,6 +5,11 @@ import { NurseService } from './nurse.service';
 @Controller('nurse')
 export class NurseController {
     constructor(private nurseService: NurseService) {}
+        @Get()
+        findAllNurses() {
+            return this.nurseService.findAllNurses();
+        }
+
         @Get('/:id')
         findNurse(@Param('id') id: number) {
             return this.nurseService.findNurse(id);

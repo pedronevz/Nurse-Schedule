@@ -1,4 +1,5 @@
 "use client"
+import NurseSelection from "../components/NurseSelection";
 import MonthYearSelection from "../components/MonthYearSelection";
 import React, { useEffect, useState } from 'react';
 import ScheduleViewer from "../components/ScheduleViewer";
@@ -8,13 +9,14 @@ const SchedulePage: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
 
+  const [nurseId, setNurseId] = useState<number | null>(null);
   const [year, setYear] = useState<number>(currentYear);
   const [month, setMonth] = useState<number>(currentMonth);
   const [schedule, setSchedule] = useState<NurseSchedule | null>(null);
   
-  const fetchSchedule = async (year: number, month: number) => {
+  const fetchSchedule = async (nurseId: number, year: number, month: number) => {
     try {
-      const response = await fetch(`http://localhost:4000/schedule/1/${year}/${month}`);
+      const response = await fetch(`http://localhost:4000/schedule/${nurseId}/${year}/${month}`);
       
       if (!response.ok) {
         throw new Error('Falha ao buscar a escala');
@@ -26,11 +28,20 @@ const SchedulePage: React.FC = () => {
       console.error('Erro ao buscar a escala:', error);
       setSchedule(null); // Definir o estado para null em caso de erro
     }
-  };
+  ;
+  }
 
   useEffect(() => {
-    fetchSchedule(year, month);
-  }, [year, month]);
+    if (nurseId !== null) {
+      fetchSchedule(nurseId, year, month);
+    }
+  }, [nurseId, year, month]);
+;  
+  
+
+  const handleNurseChange = (nurseId: number | null) => {
+    setNurseId(nurseId);
+  };
 
   const handleDateChange = (newYear: number, newMonth: number) => {
     setYear(newYear);
@@ -60,18 +71,21 @@ const SchedulePage: React.FC = () => {
     }
   };
   
-  console.log(schedule)
+  
   return (
     <div>
       <h1>Escala</h1>
-      <div>
-        <MonthYearSelection onChange={handleDateChange} />
-      </div>
-      {schedule ? (
-        <ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} />
-      ) : (
-        <p>Sem escala!</p>
-      )}
+        <NurseSelection onChange={handleNurseChange}></NurseSelection>
+        {nurseId !== null && (
+          <div>
+            <MonthYearSelection onChange={handleDateChange} />
+          {schedule ? (
+            <ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} />
+          ) : (
+            <p>Sem escala!</p>
+          )}
+          </div>
+        )}
     </div>
   );
 };
