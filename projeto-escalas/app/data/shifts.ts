@@ -1,4 +1,5 @@
 const shifts = [
+    {id: "-", description: "-", start: "00:00", end: "0:00", totalHours: "00:00", break: "00:00", workHours: "00:00" },
     { id: "M1", description: "Manhã", start: "06:00", end: "15:00", totalHours: "09:00", break: "01:00", workHours: "08:00" },
     { id: "M2", description: "Manhã", start: "06:45", end: "15:45", totalHours: "09:00", break: "01:00", workHours: "08:00" },
     { id: "S", description: "Sábado", start: "06:00", end: "16:00", totalHours: "10:00", break: "01:00", workHours: "09:00" },

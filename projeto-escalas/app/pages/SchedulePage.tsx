@@ -1,43 +1,78 @@
 "use client"
-import ScheduleGrid from "../components/ScheduleGrid";
-import {Nurse} from '../types'
-import React, { useState } from 'react';
+import MonthYearSelection from "../components/MonthYearSelection";
+import React, { useEffect, useState } from 'react';
+import ScheduleViewer from "../components/ScheduleViewer";
+import { NurseSchedule } from "../types"
 
 const SchedulePage: React.FC = () => {
-  const [nurses, setNurses] = useState<Nurse[]>([
-    { id: 1, name: 'Maria', coren:'123456' },
-    { id: 2, name: 'João', coren:'234567' }
-  ]);
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
 
-  const [year, setYear] = useState<number>(new Date().getFullYear());
-  const [month, setMonth] = useState<number>(new Date().getMonth());
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const [year, setYear] = useState<number>(currentYear);
+  const [month, setMonth] = useState<number>(currentMonth);
+  const [schedule, setSchedule] = useState<NurseSchedule | null>(null);
+  
+  const fetchSchedule = async (year: number, month: number) => {
+    try {
+      const response = await fetch(`http://localhost:4000/schedule/1/${year}/${month}`);
+      
+      if (!response.ok) {
+        throw new Error('Falha ao buscar a escala');
+      }
+      const data = await response.json();
+      setSchedule(data);
+    } 
+    catch (error) {
+      console.error('Erro ao buscar a escala:', error);
+      setSchedule(null); // Definir o estado para null em caso de erro
+    }
+  };
 
+  useEffect(() => {
+    fetchSchedule(year, month);
+  }, [year, month]);
+
+  const handleDateChange = (newYear: number, newMonth: number) => {
+    setYear(newYear);
+    setMonth(newMonth);
+  };
+
+  const handleShiftChange = async (day: string, newShift: string) => {
+    if (!schedule) return;
+    const updatedSchedule = { ...schedule };
+    updatedSchedule.schedule[day] = newShift;
+    setSchedule(updatedSchedule);
+
+    try {
+      const response = await fetch(`http://localhost:4000/schedule`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSchedule),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao atualizar o turno');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar o turno:', error);
+    }
+  };
+  
+  console.log(schedule)
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">Escala</h1>
+    <div>
+      <h1>Escala</h1>
       <div>
-        <label htmlFor="year" className="pl-4">Ano: </label>
-        <input className="w-24" type="number" id="year" value={year} onChange={(e) => setYear(parseInt(e.target.value, 10))} />
-        <label htmlFor="month">Mês: </label>
-        <select className="w-24" id="month" value={month} onChange={(e) => setMonth(parseInt(e.target.value, 10))}>
-          <option value="0">Janeiro</option>
-          <option value="1">Fevereiro</option>
-          <option value="2">Março</option>
-          <option value="3">Abril</option>
-          <option value="4">Maio</option>
-          <option value="5">Junho</option>
-          <option value="6">Julho</option>
-          <option value="7">Agosto</option>
-          <option value="8">Setembro</option>
-          <option value="9">Outubro</option>
-          <option value="10">Novembro</option>
-          <option value="11">Dezembro</option>
-        </select>
+        <MonthYearSelection onChange={handleDateChange} />
       </div>
-      <ScheduleGrid nurses={nurses} daysInMonth={daysInMonth} year={year} month={month} />
+      {schedule ? (
+        <ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} />
+      ) : (
+        <p>Sem escala!</p>
+      )}
     </div>
   );
 };
-
-export default SchedulePage;
+  export default SchedulePage;
