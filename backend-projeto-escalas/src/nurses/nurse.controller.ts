@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Body, Post } from '@nestjs/common';
+import { Controller, Get, Param, Query, Body, Post, Delete } from '@nestjs/common';
 import { NurseService } from './nurse.service';
 
 
@@ -18,6 +18,11 @@ export class NurseController {
         @Post('/')
         create(@Body() nurseDto) {
             return this.nurseService.create(nurseDto);
+        }
+
+        @Delete('/:id')
+        deleteNurse(@Param('id') id: number): Promise<void> {
+            return this.nurseService.deleteNurse(id);
         }
 }
   

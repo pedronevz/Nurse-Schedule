@@ -1,6 +1,6 @@
 import React from 'react';
 import shifts from '../data/shifts';
-import { NurseSchedule, Schedule, ScheduleViewerProps } from '../types';
+import { ScheduleViewerProps } from '../types';
 
 const ScheduleViewer: React.FC<ScheduleViewerProps> = ({ schedule, onShiftChange }) => {
   const daysInMonth = Object.keys(schedule);

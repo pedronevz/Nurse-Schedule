@@ -19,7 +19,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.pool.query(`CREATE TABLE IF NOT EXISTS nurses (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      coren VARCHAR(6) NOT NULL UNIQUE
+      coren VARCHAR(30) NOT NULL UNIQUE
     );
     
     CREATE TABLE IF NOT EXISTS schedules (

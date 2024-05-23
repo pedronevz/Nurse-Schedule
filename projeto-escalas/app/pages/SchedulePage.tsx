@@ -17,14 +17,16 @@ const SchedulePage: React.FC = () => {
   const fetchSchedule = async (nurseId: number, year: number, month: number) => {
     try {
       const response = await fetch(`http://localhost:4000/schedule/${nurseId}/${year}/${month}`);
-      
       if (!response.ok) {
         throw new Error('Falha ao buscar a escala');
       }
       const data = await response.json();
-      setSchedule(data);
-    } 
-    catch (error) {
+      if (data) {
+        setSchedule(data);
+      } else {
+        console.error('Os dados da escala estão vazios ou indefinidos.');
+      }
+    } catch (error) {
       console.error('Erro ao buscar a escala:', error);
       setSchedule(null); // Definir o estado para null em caso de erro
     }
@@ -48,15 +50,21 @@ const SchedulePage: React.FC = () => {
     setMonth(newMonth);
   };
 
+  
   const handleShiftChange = async (day: string, newShift: string) => {
-    if (!schedule) return;
-    const updatedSchedule = { ...schedule };
-    updatedSchedule.schedule[day] = newShift;
+    if (nurseId === null || !schedule) return;
+    const updatedSchedule = {
+      ...schedule,
+      schedule: {
+        ...schedule.schedule,
+        [day]: newShift,
+      },
+    };
     setSchedule(updatedSchedule);
-
+    console.log('A', updatedSchedule)
     try {
       const response = await fetch(`http://localhost:4000/schedule`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
