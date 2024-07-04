@@ -13,7 +13,9 @@ const SchedulePage: React.FC = () => {
   const [year, setYear] = useState<number>(currentYear);
   const [month, setMonth] = useState<number>(currentMonth);
   const [schedule, setSchedule] = useState<NurseSchedule | null>(null);
-  
+  const [nurseInfo, setNurseInfo] = useState<{ name: string, coren: string }>({ name: '', coren: '' });
+  const [showNurseForm, setShowNurseForm] = useState<boolean>(false); // Estado para controlar a visibilidade do cadastro de enfermeiro
+
   const fetchSchedule = async (nurseId: number, year: number, month: number) => {
     try {
       const response = await fetch(`http://localhost:4000/schedule/${nurseId}/${year}/${month}`);
@@ -39,7 +41,6 @@ const SchedulePage: React.FC = () => {
     }
   }, [nurseId, year, month]);
 ;  
-  
 
   const handleNurseChange = (nurseId: number | null) => {
     setNurseId(nurseId);
@@ -50,7 +51,6 @@ const SchedulePage: React.FC = () => {
     setMonth(newMonth);
   };
 
-  
   const handleShiftChange = async (day: string, newShift: string) => {
     if (nurseId === null || !schedule) return;
     const updatedSchedule = {
@@ -79,10 +79,60 @@ const SchedulePage: React.FC = () => {
     }
   };
   
+  const handleAddNurse = async () => {
+    const newNurse = nurseInfo;
+    // Enviar requisição POST para o backend para criar um novo enfermeiro
+    const response = await fetch('http://localhost:4000/nurse', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newNurse),
+    });
+
+    if (response.ok) {
+      // Atualizar a lista de enfermeiros
+      setNurseInfo({ name: '', coren: '' });
+      setShowNurseForm(false); // Ocultar o formulário após o cadastro
+    } else {
+      const error = await response.json();
+      alert(error.message);
+    }
+  };
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNurseInfo({ ...nurseInfo, [name]: value });
+  };
+
+  const handleShowNurseForm = () => {
+    setShowNurseForm(true);
+  };
   
   return (
     <div>
       <h1>Escala</h1>
+        <button onClick={handleShowNurseForm}>Cadastrar Enfermeiro</button>
+        {showNurseForm && (
+        <div>
+          <input
+            type="text"
+            name="name"
+            placeholder="Nome do Enfermeiro"
+            value={nurseInfo.name}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="coren"
+            placeholder="COREN"
+            value={nurseInfo.coren}
+            onChange={handleInputChange}
+          />
+          <button onClick={handleAddNurse}>Cadastrar</button>
+          <button onClick={() => setShowNurseForm(false)}>Cancelar</button>
+        </div>
+        )}
         <NurseSelection onChange={handleNurseChange}></NurseSelection>
         {nurseId !== null && (
           <div>
