@@ -9,14 +9,57 @@ const SchedulePage: React.FC = () => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
 
-  const [nurseId, setNurseId] = useState<number | null>(null);
-  const [year, setYear] = useState<number>(currentYear);
-  const [month, setMonth] = useState<number>(currentMonth);
+  const [nurseId, setNurseId] = useState<number | null>(() => { // Inicializando valor de nurseId para reload de pagina
+    // getting stored value
+    if(localStorage.getItem("pageReloaded") === "true"){
+      const saved = localStorage.getItem("nurseId");
+      return saved !== null ? parseInt(saved, 10) : null;
+    }
+    else{
+      return null;
+    }
+  });
+
+  const [year, setYear] = useState<number>(() => { 
+    // getting stored value
+    if(localStorage.getItem("pageReloaded") === "true"){
+      const saved = localStorage.getItem("year");
+      return saved !== null ? parseInt(saved, 10): currentYear
+    }
+    else{
+      return currentYear;
+    }
+  });
+
+  const [month, setMonth] = useState<number>(() => { 
+    // getting stored value
+    if(localStorage.getItem("pageReloaded") === 'true'){
+      const saved = localStorage.getItem("month");
+      return saved !== null ? parseInt(saved, 10): currentMonth
+    }
+    else{
+      return currentMonth;
+    }
+  });
+
   const [schedule, setSchedule] = useState<NurseSchedule | null>(null);
   const [nurseInfo, setNurseInfo] = useState<{ name: string, coren: string }>({ name: '', coren: '' });
   const [showNurseForm, setShowNurseForm] = useState<boolean>(false); // Estado para controlar a visibilidade do cadastro de enfermeiro
+  const [pageReloaded,setPageReloaded] = useState<string | null>(() => {
+    // getting stored value
+    const saved = localStorage.getItem("pageReloaded");
+    return saved;
+  });
+  
+  
+      console.log("Pagina reloadada: ", localStorage.getItem("pageReloaded"));
+      //console.log("LOCAL nId: ", localStorage.getItem("nurseId"));
+      //console.log("nurseId: ", nurseId)
+      //console.log("year: ", localStorage.getItem("year"));
+      //console.log("month: ", localStorage.getItem("month")); 
 
   const fetchSchedule = async (nurseId: number, year: number, month: number) => {
+    setPageReloaded("false")
     try {
       const response = await fetch(`http://localhost:4000/schedule/${nurseId}/${year}/${month}`);
       if (!response.ok) {
@@ -31,8 +74,7 @@ const SchedulePage: React.FC = () => {
     } catch (error) {
       console.error('Erro ao buscar a escala:', error);
       setSchedule(null); // Definir o estado para null em caso de erro
-    }
-  ;
+    };
   }
 
   useEffect(() => {
@@ -40,12 +82,51 @@ const SchedulePage: React.FC = () => {
       fetchSchedule(nurseId, year, month);
     }
   }, [nurseId, year, month]);
-;  
+  
+  const addSchedule = async () => {
+    if (nurseId === null) return;
+    const newSchedule = {
+      nurse_id: nurseId,
+      year: year,
+      month: month,
+      schedule: {},
+    };
+    try {
+      const response = await fetch(`http://localhost:4000/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newSchedule),
+      });
+
+      if (response.ok) {
+        const createdSchedule = await response.json();
+        setSchedule(createdSchedule);
+        setPageReloaded("true");
+        localStorage.setItem("pageReloaded", "true");
+        localStorage.setItem("nurseId", JSON.stringify(nurseId));
+        localStorage.setItem("month", JSON.stringify(month));
+        localStorage.setItem("year", JSON.stringify(year));
+        } 
+      else {
+        throw new Error('Falha ao criar a escala');
+      }
+    } catch (error) {
+      console.error('Erro ao criar a escala:', error);
+    }
+
+    window.location.reload();
+  };
+
+  const handleAddSchedule = async () => {
+      await addSchedule();
+  }
 
   const handleNurseChange = (nurseId: number | null) => {
     setNurseId(nurseId);
   };
-
+  
   const handleDateChange = (newYear: number, newMonth: number) => {
     setYear(newYear);
     setMonth(newMonth);
@@ -61,7 +142,6 @@ const SchedulePage: React.FC = () => {
       },
     };
     setSchedule(updatedSchedule);
-    console.log('A', updatedSchedule)
     try {
       const response = await fetch(`http://localhost:4000/schedule`, {
         method: 'POST',
@@ -78,7 +158,7 @@ const SchedulePage: React.FC = () => {
       console.error('Erro ao atualizar o turno:', error);
     }
   };
-  
+
   const handleAddNurse = async () => {
     const newNurse = nurseInfo;
     // Enviar requisição POST para o backend para criar um novo enfermeiro
@@ -99,7 +179,7 @@ const SchedulePage: React.FC = () => {
       alert(error.message);
     }
   };
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNurseInfo({ ...nurseInfo, [name]: value });
@@ -109,6 +189,18 @@ const SchedulePage: React.FC = () => {
     setShowNurseForm(true);
   };
   
+  useEffect(() => {
+    if (pageReloaded === 'true') {
+      const timeout = setTimeout(() => {
+        setPageReloaded('false');
+        localStorage.setItem('pageReloaded', 'false');
+      }, 1000); // Tempo em milissegundos
+
+      return () => clearTimeout(timeout); // Limpar o timeout se o componente for desmontado
+    }
+  }, []);
+
+
   return (
     <div>
       <h1>Escala</h1>
@@ -133,14 +225,14 @@ const SchedulePage: React.FC = () => {
           <button onClick={() => setShowNurseForm(false)}>Cancelar</button>
         </div>
         )}
-        <NurseSelection onChange={handleNurseChange}></NurseSelection>
+        <NurseSelection selectedNurseId={nurseId} onChange={handleNurseChange}></NurseSelection>
         {nurseId !== null && (
           <div>
-            <MonthYearSelection onChange={handleDateChange} />
+            <MonthYearSelection selectedMonth={month} selectedYear={year} onChange={handleDateChange} />
           {schedule ? (
             <ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} />
           ) : (
-            <p>Sem escala!</p>
+            <button onClick={handleAddSchedule}>Criar escala!</button>
           )}
           </div>
         )}

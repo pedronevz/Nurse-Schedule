@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Nurse, NurseSelectionProps } from '../types';
 
-const NurseSelection: React.FC<NurseSelectionProps> = ({ onChange }) => {
+const NurseSelection: React.FC<NurseSelectionProps> = ({ selectedNurseId, onChange }) => {
     const [nurses, setNurses] = useState<Nurse[]>([]);
-    const [selectedNurse, setSelectedNurse] = useState<number | null>(null);
+    const [selectedNurse, setSelectedNurse] = useState<number | null>(selectedNurseId);
     
     useEffect(() => {
         // Função para buscar a lista de enfermeiros no backend
@@ -20,6 +20,10 @@ const NurseSelection: React.FC<NurseSelectionProps> = ({ onChange }) => {
         fetchNurses();
         }, [onChange]);
     
+      useEffect(() => {
+        setSelectedNurse(selectedNurseId);
+      }, [selectedNurseId]);
+
     const handleNurseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const nurseId = e.target.value === "" ? null : parseInt(e.target.value);
         setSelectedNurse(nurseId);

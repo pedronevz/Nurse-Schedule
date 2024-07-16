@@ -3,12 +3,16 @@ import shifts from '../data/shifts';
 import { ScheduleViewerProps } from '../types';
 
 const ScheduleViewer: React.FC<ScheduleViewerProps> = ({ schedule, onShiftChange }) => {
+  if (!schedule || Object.keys(schedule).length === 0) {
+    return <p>Escala ainda não carregada.</p>;
+  }
+
   const daysInMonth = Object.keys(schedule);
 
   const handleShiftChange = (day: string, e: React.ChangeEvent<HTMLSelectElement>) => {
     onShiftChange(day, e.target.value);
   };
-    
+
   return (
     <table>
       <thead>

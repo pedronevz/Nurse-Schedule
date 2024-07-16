@@ -5,7 +5,6 @@ export interface Nurse {
 }
 
 export interface NurseSchedule{
-    id: number;
     nurse_id: number;
     month: number;
     year: number;
@@ -22,9 +21,12 @@ export interface ScheduleViewerProps {
 }
 
 export interface NurseSelectionProps {
+    selectedNurseId: number | null;
     onChange: (nurseId: number | null) => void;
   }
 
 export interface MonthYearSelectorProps {
+    selectedMonth: number;
+    selectedYear: number;
     onChange: (year: number, month: number) => void;
   }
