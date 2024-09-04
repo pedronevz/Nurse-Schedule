@@ -5,7 +5,6 @@ const MonthYearSelection: React.FC<MonthYearSelectorProps> = ({selectedMonth, se
     const [year, setYear] = useState<number>(selectedYear);
     const [month, setMonth] = useState<number>(selectedMonth);
 
-    console.log(selectedMonth)
     const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newYear = parseInt(e.target.value);
       setYear(newYear);
@@ -33,6 +32,7 @@ const MonthYearSelection: React.FC<MonthYearSelectorProps> = ({selectedMonth, se
             <option value={2023}>2023</option>
             <option value={2024}>2024</option>
             <option value={2025}>2025</option>
+            <option value={2025}>2026</option>
           </select>
           <label htmlFor="month">Mês:</label>
           <select id="month" value={month ?? new Date().getMonth() + 1} onChange={handleMonthChange}>

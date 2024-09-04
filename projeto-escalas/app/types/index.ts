@@ -18,6 +18,21 @@ export interface Schedule {
 export interface ScheduleViewerProps {
     schedule: {[day: string]: string};
     onShiftChange: (day: string, newShift: string) => void;
+    isEditable: boolean;
+    year: number;
+    month: number;
+}
+
+export type ShiftId = "-" | "M1" | "M2" | "S" | "T" | "TN" | "M" | "N" | "T1" | "S1" | "TN1" | "T2" | "TN2" | "F" | "FE";  // Tipos de turnos possíveis
+
+export interface Shift {
+    id: ShiftId;
+    description: string;
+    start: string;
+    end: string;
+    totalHours: string;
+    break: string;
+    workHours: string;
 }
 
 export interface NurseSelectionProps {

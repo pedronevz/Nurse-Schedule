@@ -51,12 +51,8 @@ const SchedulePage: React.FC = () => {
     return saved;
   });
   
-  
-      console.log("Pagina reloadada: ", localStorage.getItem("pageReloaded"));
-      //console.log("LOCAL nId: ", localStorage.getItem("nurseId"));
-      //console.log("nurseId: ", nurseId)
-      //console.log("year: ", localStorage.getItem("year"));
-      //console.log("month: ", localStorage.getItem("month")); 
+  const [isEditable, setIsEditable] = useState<boolean>(false); // Estado para controlar a editibilidade da escala
+ 
 
   const fetchSchedule = async (nurseId: number, year: number, month: number) => {
     setPageReloaded("false")
@@ -83,6 +79,24 @@ const SchedulePage: React.FC = () => {
     }
   }, [nurseId, year, month]);
   
+  useEffect(() => {
+    const currentDate = new Date();
+    const selectedDate = new Date(year, month - 1);
+    
+    const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
+    const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
+
+    if (
+      (selectedDate.getFullYear() === currentDate.getFullYear() && selectedDate.getMonth() === currentDate.getMonth()) || 
+      (selectedDate.getFullYear() === prevMonth.getFullYear() && selectedDate.getMonth() === prevMonth.getMonth()) ||
+      (selectedDate.getFullYear() === nextMonth.getFullYear() && selectedDate.getMonth() === nextMonth.getMonth())
+    ) {
+      setIsEditable(true);
+    } else {
+      setIsEditable(false);
+    }
+  }, [year, month]);
+
   const addSchedule = async () => {
     if (nurseId === null) return;
     const newSchedule = {
@@ -189,12 +203,12 @@ const SchedulePage: React.FC = () => {
     setShowNurseForm(true);
   };
   
-  useEffect(() => {
+  useEffect(() => {   // Isso é só para ativar a condição de reload da página. Decide se vai voltar no mesmo lugar ou se vai resetar a página ao dar reload
     if (pageReloaded === 'true') {
       const timeout = setTimeout(() => {
         setPageReloaded('false');
         localStorage.setItem('pageReloaded', 'false');
-      }, 1000); // Tempo em milissegundos
+      }, 1000000); // 1000s 
 
       return () => clearTimeout(timeout); // Limpar o timeout se o componente for desmontado
     }
@@ -229,11 +243,10 @@ const SchedulePage: React.FC = () => {
         {nurseId !== null && (
           <div>
             <MonthYearSelection selectedMonth={month} selectedYear={year} onChange={handleDateChange} />
-          {schedule ? (
-            <ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} />
-          ) : (
-            <button onClick={handleAddSchedule}>Criar escala!</button>
-          )}
+          {schedule 
+            ? (<ScheduleViewer schedule={schedule.schedule} onShiftChange={handleShiftChange} isEditable={isEditable} year={year} month={month}/>) 
+            : ( isEditable && <button onClick={handleAddSchedule}>Criar escala!</button>)
+          }
           </div>
         )}
     </div>
