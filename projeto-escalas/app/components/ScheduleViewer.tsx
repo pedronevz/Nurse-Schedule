@@ -35,17 +35,45 @@ const ScheduleViewer: React.FC<ScheduleViewerProps> = ({ schedule, onShiftChange
     }
 
   const daysInMonth = Object.keys(schedule);
-  const daysInWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  let daysInWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const d = new Date(year, month - 1, 1);
+  const firstDay = daysInWeek[d.getDay()]
+  
+  // Montar calendário baseado no primeiro dia
+  switch (firstDay){
+    case 'Dom':
+        daysInWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+        break;
+    case 'Seg':
+        daysInWeek = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+        break;
+    case 'Ter':
+        daysInWeek = ['Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Seg']
+        break;
+    case 'Qua':
+        daysInWeek = ['Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Seg', 'Ter']
+        break;
+    case 'Qui':
+        daysInWeek = ['Qui', 'Sex', 'Sáb', 'Dom', 'Seg', 'Ter', 'Qua']
+        break;
+    case 'Sex':
+        daysInWeek = ['Sex', 'Sáb', 'Dom', 'Seg', 'Ter', 'Qua', 'Qui']
+        break;
+    case 'Sab':
+        daysInWeek = ['Sáb', 'Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex']
+        break;   
+  }
 
   const renderCalendar = () => {
     const weeks: JSX.Element[] = [];
     let currentWeek: JSX.Element[] = [];
 
+    console.log(daysInMonth)
     daysInMonth.forEach((day, index) => {
-      console.log('day:', day)
-        const dayOfWeek = new Date(year, month, parseInt(day)).getDay();
-        console.log('dayOfWeek:', dayOfWeek)
-        console.log(currentWeek)
+      //console.log('day:', day)
+        const dayOfWeek = new Date(year, month - 1, parseInt(day)).getDay();
+    //    console.log('dayOfWeek:', dayOfWeek)
+  //      console.log(currentWeek)
         currentWeek.push(
             <td key={day} className="p-2 border">
                 <div>{day}</div>
@@ -63,7 +91,7 @@ const ScheduleViewer: React.FC<ScheduleViewerProps> = ({ schedule, onShiftChange
             </td>
         );
 
-        if (dayOfWeek === 6 || index === daysInMonth.length - 1) {
+        if (day === '7'|| day === '14' || day === '21' || day === '28' || index === daysInMonth.length - 1) { // pular linha calendario
             weeks.push(<tr key={index}>{currentWeek}</tr>);
             currentWeek = [];
         }
